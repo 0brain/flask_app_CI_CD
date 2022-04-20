@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Basal Metabolic Rate</title>
+    <link rel="stylesheet" href="static/css/bootstrap.min.css" >
+</head>
+<body class="bg-light">
+
+<div class="container">
+  <div class="py-5 text-center">
+    <h2>BMR checkout form</h2>
+    <p class="lead">Below is a form allows you to calculate Basal Metabolic Rate using <a href="https://en.wikipedia.org/wiki/Basal_metabolic_rate#:~:text=The%20original%20Harris%E2%80%93Benedict%20equation">Harris–Benedict equation</a> and compare the daily required amount of calories with the amount of calories received during current day.</p><br>
+    <p class="lead" style="color:#FF0000">Please read the guidelines for entering data in each field! </p>
+  </div>
+</div>
+
+  <div class="d-flex justify-content-center">
+      <form method="post">
+          <div class="form-group">
+              <label class="lead">Gender <span class="text-muted">(choose your gender)</span></label>
+          <div class="form-check">
+              <input class="form-check-input" name="gender" type="radio" id="male" value="male" required>
+              <label class="form-check-label" for="male">Male</label>
+          </div>
+          <div class="form-check">
+              <input class="form-check-input" name="gender" type="radio" id="female" value="female" required>
+              <label class="form-check-label" for="female">Female</label>
+          </div>
+          </div>
+
+          <br>
+
+          <div class="form-group">
+              <label class="lead" for="height">Height <span class="text-muted">(your height in centimeters)</span></label>
+              <input type="number" step="any" class="form-control" id="height" name="height" required>
+          </div>
+
+          <br>
+
+          <div class="form-group">
+              <label class="lead" for="age">Age <span class="text-muted">(your age in years)</span></label>
+              <input type="number" step="any" class="form-control" id="age" name="age" required>
+          </div>
+
+          <br>
+
+          <div class="form-group">
+              <label class="lead" for="mass">Mass <span class="text-muted">(your mass in kilograms)</span></label>
+              <input type="number" step="any" class="form-control" id="mass" name="mass" required>
+          </div>
+
+          <br>
+
+           <div class="form-group">
+              <label class="lead" for="food">List of food <span class="text-muted">(each type of food must be specified from a new line)</span></label>
+              <textarea id="food" class="form-control" cols="30" rows ="15" name="food" required></textarea>
+          </div>
+
+          <br>
+
+          <button type="submit" class="btn btn-primary" value="Show calories">Submit</button>
+
+      </form>
+
+  </div>
+      <br>
+</body>
+</html>

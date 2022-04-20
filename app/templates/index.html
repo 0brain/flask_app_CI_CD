@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BMR-result</title>
+    <link rel="stylesheet" href="static/css/bootstrap.min.css" >
+</head>
+
+<body class="bg-light">
+    <div class="container text-center d-flex align-items-center justify-content-center">
+        <a href="{{url_for('index')}}"><button type="button" class="btn btn-dark m-3 p-3">Back to BMR form</button></a>
+        <div class="py-5 text-center fs-3">
+          <p>
+             Daily required amount of calories - {{ calories }}
+          </p>
+          <p>
+              The amount of calories received during current day - {{ food|safe }}
+          </p>
+        </div>
+    </div>
+</body>
+</html>
