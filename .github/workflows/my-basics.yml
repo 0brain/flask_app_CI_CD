@@ -1,0 +1,89 @@
+name: CI-CD-Pipeline-to-AWS-ElasticBeastalk
+env:
+  EB_PACKAGE_S3_BUCKET_NAME: "lesson-20-flask-app-packages"
+  EB_APPLICATION_NAME: "MyFlaskBMR"
+  EB_ENVIRONMENT_NAME: "Myflaskbmr-env-1"
+  DEPLOY_PACKAGE_NAME: "flask_app_${{ github.sha }}.zip"
+  AWS_REGION_NAME: "eu-central-1"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.9.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.9.8"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Lint with flake8 without docker-compose
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 app --count --select=E9,F63,F7,F82,W391 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 107 chars wide
+          flake8 app --count --exit-zero --max-complexity=18 --max-line-length=107 --statistics
+      - name: Run pytests
+        run: python -m pytest -v tests
+
+      - name: Print Happy Message for tests finish
+        run: echo "Tests part Finished successfully!"
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [ tests ]
+    
+    steps:
+      - name: Git clone our repo
+        uses: actions/checkout@v1
+
+      - name: Create ZIP deployment package
+        run: zip -r ${{ env.DEPLOY_PACKAGE_NAME }} ./ -x *.git*
+        
+      - name: Configure my AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.MY_AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.MY_AWS_SECRET_KEY }}
+          aws-region: ${{ env.AWS_REGION_NAME }}
+      
+      - name: Copy deployment package to S3 bucket
+        run: aws s3 cp ${{ env.DEPLOY_PACKAGE_NAME }}  s3://${{ env.EB_PACKAGE_S3_BUCKET_NAME }}/
+
+      - name: Print happy message for build job finish
+        run: echo "Build pipeline part finished successfully!"
+        
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+
+    steps:
+      - name: Configure my AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.MY_AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.MY_AWS_SECRET_KEY }}
+          aws-region: ${{ env.AWS_REGION_NAME }}
+
+      - name: Create new ElasticBeanstalk application version
+        run: |
+          aws elasticbeanstalk create-application-version \
+          --application-name ${{ env.EB_APPLICATION_NAME }} \
+          --source-bundle S3Bucket="${{ env.EB_PACKAGE_S3_BUCKET_NAME }}",S3Key="${{ env.DEPLOY_PACKAGE_NAME }}" \
+          --version-label "Ver-${{ github.sha }}" \
+          --description "CommitSHA-${{ github.sha }}"
+          
+      - name: Deploy new ElasticBeanstalk application version
+        run: aws elasticbeanstalk update-environment --environment-name ${{ env.EB_ENVIRONMENT_NAME }} --version-label "Ver-${{ github.sha }}"
+
+      - name: Print Happy Message for deploy finish
+        run: echo "Deploy pipeline part finished successfully!"
