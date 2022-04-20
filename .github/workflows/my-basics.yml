@@ -5,6 +5,8 @@ env:
   EB_ENVIRONMENT_NAME: "Flaskbmr-env"
   DEPLOY_PACKAGE_NAME: "flask_app_${{ github.sha }}.zip"
   AWS_REGION_NAME: "eu-central-1"
+  APP_ID: "${{ secrets.APP_ID }}"
+  APP_KEY: "${{ secrets.APP_KEY }}"
 
 on:
   push:
